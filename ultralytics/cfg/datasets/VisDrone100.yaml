@@ -1,0 +1,18 @@
+# VisDrone100 deterministic subset for YOLO26 full-backbone replacement double-100 experiments.
+
+path: D:/Users/D/Desktop/ultralytics26-main7.10/datasets/VisDrone100
+train: images/train2017
+val: images/val2017
+test: images/test2017
+
+names:
+  0: pedestrian
+  1: people
+  2: bicycle
+  3: car
+  4: van
+  5: truck
+  6: tricycle
+  7: awning-tricycle
+  8: bus
+  9: motor

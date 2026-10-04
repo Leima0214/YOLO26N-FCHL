@@ -1,0 +1,11 @@
+# Copy to japan4.local.yaml and set an absolute dataset root on this machine.
+# Use the existing cleanV3 split; do not regenerate it for this migration.
+path: /ABSOLUTE/PATH/TO/Japan4-cleanV3
+train: images/train
+val: images/val
+nc: 4
+names:
+  0: D00
+  1: D10
+  2: D20
+  3: D40

@@ -1,0 +1,2 @@
+# Preserve migrated bytes so provenance hashes survive clone on any platform.
+* -text

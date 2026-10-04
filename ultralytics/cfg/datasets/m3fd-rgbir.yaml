@@ -1,0 +1,17 @@
+path: datasets/m3fd-original-200
+train: images/train
+val: images/val
+test: images/test
+channels: 4
+rgbir_pair: true
+rgbir_rgb_dir: images
+rgbir_ir_dir: ir
+rgbir_label_dir: labels
+names:
+  0: People
+  1: Car
+  2: Bus
+  3: Motorcycle
+  4: Lamp
+  5: Truck
+download: "from pathlib import Path\nimport subprocess, sys\nrepo = Path(yaml.get('yaml_file', '.')).resolve().parents[3]\nsubprocess.run([sys.executable, str(repo / 'tools' / 'prepare_m3fd_rgbir.py'), '--source', str(yaml['path']), '--root', str(repo / 'datasets' / 'm3fd-original-200'), '--total-samples', '200', '--no-download'], check=True)\n"

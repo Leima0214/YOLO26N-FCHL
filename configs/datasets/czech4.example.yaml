@@ -1,0 +1,11 @@
+# Reserved target. Run only after source-only model selection is frozen.
+# Copy to czech4.local.yaml and retain the audited Common4 mapping.
+path: /ABSOLUTE/PATH/TO/Czech4
+train: images/train
+val: images/val
+nc: 4
+names:
+  0: D00
+  1: D10
+  2: D20
+  3: D40

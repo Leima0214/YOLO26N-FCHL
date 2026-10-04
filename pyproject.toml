@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ultralytics"
+version = "8.4.2+fchl.0"
+description = "YOLO26n Paper 2 research foundation migrated from YOLO26N-RDP4"
+requires-python = ">=3.11"
+license = {file = "LICENSE"}
+dynamic = ["dependencies"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.setuptools.packages.find]
+include = ["ultralytics*", "scripts*"]
+
+[tool.setuptools.package-data]
+ultralytics = ["cfg/**/*.yaml", "assets/*.jpg"]

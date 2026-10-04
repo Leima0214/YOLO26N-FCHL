@@ -1,0 +1,92 @@
+# 🐧Please note that this file has been modified by Tencent on 2026/01/16. All Tencent Modifications are Copyright (C) 2026 Tencent.# 🐧Please note that this file has been modified by Tencent on 2026/01/09. All Tencent Modifications are Copyright (C) 2026 Tencent.
+"""
+Mixture-of-Experts (MoE) modules, routing layers, and compatibility shims.
+
+This module provides several MoE variants and routers optimized for inference efficiency,
+plus backward-compatibility aliases so legacy checkpoints can be loaded without changes.
+"""
+
+from .modules import (
+    UltraOptimizedMoE,
+    AdaptiveCapacityMoE,
+    ES_MOE,
+    OptimizedMOE,
+    OptimizedMOEImproved,
+    MOE,
+    EfficientSpatialRouterMoE,
+    ModularRouterExpertMoE,
+    HyperSplitMoE,
+    HyperFusedMoE,
+    HyperUltimateMoE,
+    UltimateOptimizedMoE,
+)
+
+from .experts import (
+    OptimizedSimpleExpert,
+    FusedGhostExpert,
+    SimpleExpert,
+    GhostExpert,
+    InvertedResidualExpert,
+    EfficientExpertGroup,
+    DepthwiseSeparableConv
+)
+
+from .routers import (
+    UltraEfficientRouter,
+    BaseRouter,
+    EfficientSpatialRouter,
+    AdaptiveRoutingLayer,
+    LocalRoutingLayer,
+    AdvancedRoutingLayer,
+    DynamicRoutingLayer
+)
+
+from .utils import (
+    FlopsUtils,
+    get_safe_groups,
+    BatchedExpertComputation
+)
+
+from .pruning import prune_moe_model
+
+__all__ = [
+    "UltraOptimizedMoE",
+    "AdaptiveCapacityMoE",
+    "ES_MOE",
+    "OptimizedMOE",
+    "OptimizedMOEImproved",
+    "MOE",
+    "EfficientSpatialRouterMoE",
+    "ModularRouterExpertMoE",
+    "HyperSplitMoE",
+    "HyperFusedMoE",
+    "HyperUltimateMoE",
+    "UltimateOptimizedMoE",
+    "OptimizedSimpleExpert",
+    "FusedGhostExpert",
+    "SimpleExpert",
+    "GhostExpert",
+    "InvertedResidualExpert",
+    "EfficientExpertGroup",
+    "DepthwiseSeparableConv",
+    "UltraEfficientRouter",
+    "BaseRouter",
+    "EfficientSpatialRouter",
+    "AdaptiveRoutingLayer",
+    "LocalRoutingLayer",
+    "AdvancedRoutingLayer",
+    "DynamicRoutingLayer",
+    "FlopsUtils",
+    "get_safe_groups",
+    "BatchedExpertComputation",
+    "prune_moe_model"
+]
+
+
+def __getattr__(name):
+    """Lazily import analysis helpers to avoid pulling plotting dependencies into training startup."""
+    if name in {"ExpertUsageTracker", "diagnose_model"}:
+        from .analysis import ExpertUsageTracker, diagnose_model
+
+        return {"ExpertUsageTracker": ExpertUsageTracker, "diagnose_model": diagnose_model}[name]
+    raise AttributeError(f"module {__name__} has no attribute {name}")
