@@ -235,6 +235,8 @@ def save_epoch_status(trainer, metadata_dir: Path) -> None:
 
 
 def save_effective_optimizer(trainer, metadata_dir: Path) -> None:
+    trainer.paper2_amp_scale = trainer.scaler.get_scale()
+    trainer.paper2_amp_backoffs = 0
     report = {
         "optimizer": type(trainer.optimizer).__name__,
         "groups": [{key: group[key] for key in ("lr", "initial_lr", "momentum", "betas", "weight_decay") if key in group}

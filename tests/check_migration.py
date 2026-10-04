@@ -3,6 +3,7 @@
 import json
 from pathlib import Path
 import sys
+from types import SimpleNamespace
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -11,6 +12,7 @@ import torch
 from pycocotools.coco import COCO
 
 from scripts.eval_paper2 import ap, evaluate
+from scripts.train_paper2 import record_amp_scale
 from scripts.paper2_common import O2MValidator, file_sha256, install_fixed_schedule, make_o2m_model
 from ultralytics.cfg import get_cfg
 from ultralytics.nn.autobackend import AutoBackend
@@ -19,6 +21,12 @@ from ultralytics.utils.loss import E2ELoss, v8DetectionLoss
 
 
 def main():
+    trainer = SimpleNamespace(paper2_amp_scale=16, paper2_amp_backoffs=0)
+    for scale in (8, 8, 16, 8):
+        trainer.scaler = SimpleNamespace(get_scale=lambda: scale)
+        record_amp_scale(trainer)
+    assert trainer.paper2_amp_backoffs == 2
+    print("PASS: AMP backoffs are counted once per scale decrease")
     torch.set_num_threads(2)
     torch.manual_seed(42)
     baseline = DetectionModel(str(ROOT / "ultralytics/cfg/models/26/yolo26.yaml"), nc=4, verbose=False)

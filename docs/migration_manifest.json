@@ -2346,7 +2346,7 @@
       "source": "scripts/train_japan4_candidate.py",
       "destination": "scripts/train_paper2.py",
       "source_sha256": "7333b76a54b07f863ae0be92f3aa9c5ee83cf83127393f14e318a7f98955e9e7",
-      "destination_sha256": "0e2d32c2277f8bbe28325878d13af1f641d7153e282e39e4b57eb1ee67c5e0bb",
+      "destination_sha256": "c0df842395ec23d75301c013642ebb94339c76c8c3a9279a3f46de1aefdc160f",
       "modified": true
     },
     {
