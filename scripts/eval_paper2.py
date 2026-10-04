@@ -180,6 +180,8 @@ def main() -> None:
                 "model": name,
                 "P": native["metrics/precision(B)"],
                 "R": native["metrics/recall(B)"],
+                "native_AP50": native["metrics/mAP50(B)"],
+                "native_AP50_95": native["metrics/mAP50-95(B)"],
                 "AP50": ap(all_eval, iou=0.50),
                 "AP50_95": ap(all_eval),
                 "AP75": ap(all_eval, iou=0.75),
