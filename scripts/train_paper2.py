@@ -186,10 +186,14 @@ def main() -> None:
         if resume:
             model = YOLO(str(resume), task="detect")
             model.add_callback("on_train_start", lambda trainer: save_effective_optimizer(trainer, metadata_dir))
+            model.add_callback("on_train_batch_end", record_amp_scale)
+            model.add_callback("on_fit_epoch_end", lambda trainer: save_epoch_status(trainer, metadata_dir))
             model.train(trainer=Paper2Trainer, resume=str(resume))
         else:
             model = YOLO(str(model_yaml), task="detect").load(str(args.weights))
             model.add_callback("on_train_start", lambda trainer: save_effective_optimizer(trainer, metadata_dir))
+            model.add_callback("on_train_batch_end", record_amp_scale)
+            model.add_callback("on_fit_epoch_end", lambda trainer: save_epoch_status(trainer, metadata_dir))
             model.train(
                 trainer=Paper2Trainer,
                 data=str(data_yaml),
@@ -210,6 +214,24 @@ def main() -> None:
         (metadata_dir / "exit_code.txt").write_text(f"{exit_code}\n", encoding="utf-8")
         if save_dir is not None:
             shutil.copytree(metadata_dir, save_dir / "runtime_meta", dirs_exist_ok=True)
+
+
+def record_amp_scale(trainer) -> None:
+    scale = trainer.scaler.get_scale()
+    previous = getattr(trainer, "paper2_amp_scale", scale)
+    trainer.paper2_amp_backoffs = getattr(trainer, "paper2_amp_backoffs", 0) + int(scale < previous)
+    trainer.paper2_amp_scale = scale
+
+
+def save_epoch_status(trainer, metadata_dir: Path) -> None:
+    report = {"epoch": trainer.epoch + 1, "amp_enabled": bool(trainer.amp),
+              "amp_scale": trainer.scaler.get_scale(),
+              "amp_scale_backoffs": getattr(trainer, "paper2_amp_backoffs", 0),
+              "ema_optimizer_updates": trainer.ema.updates,
+              "criterion": type(trainer.model.criterion).__name__,
+              "loss_weights": {"o2m": getattr(trainer.model.criterion, "o2m", 1.0),
+                               "o2o": getattr(trainer.model.criterion, "o2o", 0.0)}}
+    (metadata_dir / "epoch_status.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
 
 
 def save_effective_optimizer(trainer, metadata_dir: Path) -> None:
