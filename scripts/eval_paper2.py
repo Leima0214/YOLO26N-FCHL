@@ -44,7 +44,7 @@ def remap_predictions(path: Path, ground_truth: COCO) -> list[dict]:
     image_ids = {Path(image["file_name"]).stem: image_id for image_id, image in ground_truth.imgs.items()}
     category_ids = {category["name"]: category_id for category_id, category in ground_truth.cats.items()}
     output = []
-    for prediction in json.loads(path.read_text(encoding="utf-8")) if path.exists() else []:
+    for prediction in json.loads(path.read_text(encoding="utf-8")):
         stem = Path(prediction["file_name"]).stem
         class_index = int(prediction["category_id"]) - 1
         if stem not in image_ids or not 0 <= class_index < len(NAMES):
@@ -130,6 +130,7 @@ def main() -> None:
     parser.add_argument("--workers", type=int, default=8)
     parser.add_argument("--device", default="0")
     args = parser.parse_args()
+    args.output = args.output.expanduser().resolve()
     checkpoints = parse_checkpoints(args.checkpoint)
     if args.output.exists() and any(args.output.iterdir()):
         raise FileExistsError(f"Refusing to overwrite non-empty output: {args.output}")
@@ -151,6 +152,9 @@ def main() -> None:
         if tuple(model.names.values()) != NAMES:
             raise ValueError(f"Checkpoint does not use Common4 class order: {model.names}")
         model.model = make_o2m_model(model.model)
+        export = {}
+        model.add_callback("on_val_end", lambda validator: export.update(
+            path=validator.save_dir / "predictions.json", count=len(validator.jdict)))
         metrics = model.val(
             data=str(args.data.resolve()),
             split="val",
@@ -169,8 +173,12 @@ def main() -> None:
             exist_ok=True,
             verbose=False,
         )
-        prediction_path = args.output / "predictions" / name / "predictions.json"
+        prediction_path = export["path"]
+        if export["count"] == 0 and not prediction_path.exists():
+            prediction_path.write_text("[]", encoding="utf-8")
         predictions = remap_predictions(prediction_path, ground_truth)
+        if len(predictions) != export["count"]:
+            raise ValueError("Prediction export count differs from the validator output")
         all_eval = evaluate(ground_truth, predictions, list(categories.values()))
         native = metrics.results_dict
         parameters = sum(parameter.numel() for parameter in model.model.parameters())

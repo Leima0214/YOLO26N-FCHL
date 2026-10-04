@@ -11,7 +11,7 @@ sys.path.insert(0, str(ROOT))
 import torch
 from pycocotools.coco import COCO
 
-from scripts.eval_paper2 import ap, evaluate
+from scripts.eval_paper2 import ap, evaluate, remap_predictions
 from scripts.train_paper2 import record_amp_scale
 from scripts.paper2_common import O2MValidator, file_sha256, install_fixed_schedule, make_o2m_model
 from ultralytics.cfg import get_cfg
@@ -121,7 +121,17 @@ def main():
                                    "bbox": [10, 10, 10, 10], "area": 100, "iscrowd": 0}]}
     gt.createIndex()
     assert ap(evaluate(gt, [], [1])) == 0.0
-    print("PASS: zero detections produce valid COCO metrics")
+    prediction_path = ROOT / "reports/engineering_check/synthetic_predictions.json"
+    prediction_path.write_text(json.dumps([{"file_name": "synthetic.jpg", "category_id": 1,
+                                           "bbox": [10, 10, 10, 10], "score": 0.9}]), encoding="utf-8")
+    assert ap(evaluate(gt, remap_predictions(prediction_path, gt), [1])) > 0.99
+    try:
+        remap_predictions(prediction_path.with_name("missing_predictions.json"), gt)
+    except FileNotFoundError:
+        pass
+    else:
+        raise AssertionError("Missing prediction export must never be silently treated as zero detections")
+    print("PASS: zero detections, perfect detections, filename/class remapping and missing-export failure")
 
     manifest = json.loads((ROOT / "docs/migration_manifest.json").read_text(encoding="utf-8"))
     for item in manifest["files"]:
