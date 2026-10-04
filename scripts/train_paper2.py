@@ -19,24 +19,26 @@ sys.path.insert(0, str(ROOT))
 
 from ultralytics import YOLO  # noqa: E402
 from ultralytics.utils.torch_utils import init_seeds  # noqa: E402
-from scripts.paper2_common import Paper2Trainer, file_sha256, install_fixed_schedule  # noqa: E402
+from scripts.paper2_common import Paper2Trainer, file_sha256, install_fixed_schedule, o2m_state_sha256  # noqa: E402
 
 MODELS = {
     "b0": ROOT / "ultralytics/cfg/models/26/yolo26.yaml",
+    "b0_o2m": ROOT / "ultralytics/cfg/models/26/yolo26n-paper2-o2m.yaml",
     "s1": ROOT / "ultralytics/cfg/models/26/yolo26n-japan4-s1-strip-regression.yaml",
 }
 TRAINING_PROTOCOL = {
-    "optimizer": "auto",
+    "optimizer": "MuSGD",
     "amp": True,
     "deterministic": True,
     "val": True,
     "patience": 1_000_000_000,
     "cos_lr": False,
-    "lr0": 0.01,
+    "lr0": 0.00125,
     "lrf": 0.01,
-    "momentum": 0.937,
+    "momentum": 0.9,
     "weight_decay": 0.0005,
     "warmup_epochs": 3.0,
+    "warmup_bias_lr": 0.0,
     "mosaic": 1.0,
     "mixup": 0.0,
     "copy_paste": 0.0,
@@ -119,7 +121,8 @@ def save_metadata(args: argparse.Namespace, model_yaml: Path, data_yaml: Path, m
         "resume_from": str(args.resume_from) if args.resume_from else None,
         "model_yaml": str(model_yaml),
         **TRAINING_PROTOCOL,
-        "loss_weights": {"o2m": 0.8, "o2o": 0.2, "schedule": "fixed"},
+        "loss_weights": {"o2m": 1.0 if args.candidate == "b0_o2m" else 0.8,
+                         "o2o": 0.0 if args.candidate == "b0_o2m" else 0.2, "schedule": "fixed"},
         "validation_branch": "O2M + class-aware NMS",
         "checkpoint_selection": "source validation AP50:95",
         "input_weights_sha256": file_sha256(args.resume_from or args.weights),
@@ -215,6 +218,9 @@ def save_effective_optimizer(trainer, metadata_dir: Path) -> None:
         "groups": [{key: group[key] for key in ("lr", "initial_lr", "momentum", "betas", "weight_decay") if key in group}
                    for group in trainer.optimizer.param_groups],
         "save_dir": str(trainer.save_dir),
+        "criterion": type(trainer.model.init_criterion()).__name__,
+        "end2end": trainer.model.end2end,
+        "initial_o2m_state_sha256": o2m_state_sha256(trainer.model),
     }
     (metadata_dir / "effective_optimizer.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
 

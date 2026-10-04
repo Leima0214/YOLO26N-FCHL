@@ -15,7 +15,7 @@ from scripts.paper2_common import O2MValidator, file_sha256, install_fixed_sched
 from ultralytics.cfg import get_cfg
 from ultralytics.nn.autobackend import AutoBackend
 from ultralytics.nn.tasks import DetectionModel
-from ultralytics.utils.loss import E2ELoss
+from ultralytics.utils.loss import E2ELoss, v8DetectionLoss
 
 
 def main():
@@ -46,6 +46,30 @@ def main():
     assert torch.isfinite(losses).all() and torch.isfinite(items).all()
     assert isinstance(criterion, E2ELoss) and strip.end2end
     print("PASS: fixed 0.8/0.2 schedule and dual-head loss remain available")
+
+    pure = DetectionModel(str(ROOT / "ultralytics/cfg/models/26/yolo26n-paper2-o2m.yaml"), nc=4, verbose=False)
+    pure.load(baseline, verbose=False)
+    pure.args = get_cfg()
+    assert not pure.end2end and isinstance(pure.init_criterion(), v8DetectionLoss)
+    for name, tensor in pure.state_dict().items():
+        torch.testing.assert_close(tensor, baseline.state_dict()[name], atol=0, rtol=0)
+    pure.train()
+    pure_losses, _ = pure.loss(batch, pure(sample.repeat(2, 1, 1, 1)))
+    pure_losses.sum().backward()
+    assert pure.model[-1].cv2[0][0].conv.weight.grad is not None
+    pure.eval()
+    with torch.no_grad():
+        pure_output = pure(sample)
+    pure_validator = O2MValidator(args={"conf": 0.00001, "iou": 0.7, "max_det": 300, "plots": False},
+                                 save_dir=ROOT / "reports/engineering_check")
+    pure_validator.training, pure_validator.end2end, pure_validator.box_head = True, False, pure.model[-1]
+    pure_train = pure_validator.postprocess((pure_output[0].clone(), pure_output[1]))
+    pure_validator.training = False
+    pure_eval = pure_validator.postprocess((pure_output[0].clone(), pure_output[1]))
+    for left, right in zip(pure_train, pure_eval):
+        for field in ("bboxes", "conf", "cls"):
+            torch.testing.assert_close(left[field], right[field])
+    print("PASS: pure O2M topology, identical shared tensors, backward and validation")
 
     # Make the heads differ so a wrong branch cannot pass through identity initialization.
     with torch.no_grad():

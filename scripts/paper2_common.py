@@ -18,6 +18,16 @@ def file_sha256(path):
         return hashlib.file_digest(handle, "sha256").hexdigest()
 
 
+def o2m_state_sha256(model):
+    """Fingerprint all shared initialized tensors, including the four-class O2M head."""
+    digest = hashlib.sha256()
+    for name, tensor in model.state_dict().items():
+        if "one2one" not in name:
+            digest.update(name.encode())
+            digest.update(tensor.detach().cpu().contiguous().numpy().tobytes())
+    return digest.hexdigest()
+
+
 def fixed_e2e_update(self):
     self.updates += 1
     self.o2m, self.o2o = 0.8, 0.2
@@ -54,7 +64,7 @@ class O2MValidator(DetectionValidator):
             self.box_head = model.model[-1]
 
     def postprocess(self, preds):
-        if self.training:
+        if self.training and self.box_head.end2end:
             # Loss still receives the original dual-head output. Decode only for metrics.
             decoded = self.box_head._inference(preds[1]["one2many"])
             boxes = xyxy2xywh(decoded[:, :4].transpose(1, 2)).transpose(1, 2)
