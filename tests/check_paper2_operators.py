@@ -35,10 +35,11 @@ def main():
     baseline.load(source, verbose=False)
     baseline.eval().to(device)
     baseline.args = get_cfg()
-    sample = torch.randn(2, 3, 64, 64, device=device)
+    # Include a large target so P4 gets usable regression gradients under fp16.
+    sample = torch.randn(2, 3, 256, 256, device=device)
     batch = {"img": sample, "batch_idx": torch.tensor([0., 1.], device=device),
              "cls": torch.zeros(2, 1, device=device),
-             "bboxes": torch.tensor([[.5, .5, .3, .2], [.4, .4, .2, .3]], device=device)}
+             "bboxes": torch.tensor([[.5, .5, .1, .08], [.5, .5, .7, .6]], device=device)}
     with torch.no_grad():
         native = baseline(sample)
     raw, decoded = decode_branch(baseline.model[-1], native[1], "o2m")
