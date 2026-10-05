@@ -7,6 +7,7 @@ import copy
 import math
 
 import torch
+from torchvision.ops import DeformConv2d
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.init import constant_, xavier_uniform_
@@ -357,6 +358,50 @@ class RegionGuidedDetect(_RegionGuidanceMixin, Detect):
     def __init__(self, nc: int = 80, reg_max=16, end2end=False, ch: tuple = ()):
         super().__init__(nc, reg_max, end2end, ch)
         self._init_region_guidance(ch)
+
+
+class ConvControlResidual(StripAwareResidual):
+    """Three ordinary 3x3 depthwise branches with the same static fusion and residual shell as A."""
+
+    def __init__(self, channels: int):
+        super().__init__(channels, 3)
+        self.horizontal = nn.Conv2d(channels, channels, 3, padding=1, groups=channels, bias=False)
+        self.vertical = nn.Conv2d(channels, channels, 3, padding=1, groups=channels, bias=False)
+
+
+class DeformResidual(nn.Module):
+    """Minimal depthwise deformable residual; offset group is shared across channels."""
+
+    def __init__(self, channels: int):
+        super().__init__()
+        self.offset = nn.Conv2d(channels, 18, 3, padding=1)
+        self.deform = DeformConv2d(channels, channels, 3, padding=1, groups=channels, bias=False)
+        nn.init.zeros_(self.offset.weight)
+        nn.init.zeros_(self.offset.bias)
+        self.gamma = nn.Parameter(torch.zeros(()))
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return x + self.gamma * self.deform(x, self.offset(x))
+
+
+class ConvControlDetect(StripDetect):
+    """Pure O2M ordinary-convolution control on P3/P4 regression inputs."""
+
+    def __init__(self, nc: int = 80, reg_max=1, end2end=False, ch: tuple = ()):
+        if end2end or len(ch) != 3:
+            raise ValueError("Paper 2 C requires pure O2M and P3/P4/P5")
+        Detect.__init__(self, nc, reg_max, False, ch)
+        self.strip_cv2 = nn.ModuleList((ConvControlResidual(ch[0]), ConvControlResidual(ch[1]), nn.Identity()))
+
+
+class DeformDetect(StripDetect):
+    """Pure O2M minimal deformable sampling on P3/P4 regression inputs."""
+
+    def __init__(self, nc: int = 80, reg_max=1, end2end=False, ch: tuple = ()):
+        if end2end or len(ch) != 3:
+            raise ValueError("Paper 2 R requires pure O2M and P3/P4/P5")
+        Detect.__init__(self, nc, reg_max, False, ch)
+        self.strip_cv2 = nn.ModuleList((DeformResidual(ch[0]), DeformResidual(ch[1]), nn.Identity()))
 
 
 class StripRegionGuidedDetect(_RegionGuidanceMixin, StripDetect):

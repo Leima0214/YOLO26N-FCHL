@@ -1,4 +1,4 @@
-"""Source-only Paper 2 training for native B0 and the migrated static Strip candidate."""
+"""Source-only Paper 2 training for B0 and regression-operator controls."""
 
 from __future__ import annotations
 
@@ -24,6 +24,9 @@ from scripts.paper2_common import Paper2Trainer, file_sha256, install_fixed_sche
 MODELS = {
     "b0": ROOT / "ultralytics/cfg/models/26/yolo26.yaml",
     "b0_o2m": ROOT / "ultralytics/cfg/models/26/yolo26n-paper2-o2m.yaml",
+    "c_o2m": ROOT / "ultralytics/cfg/models/26/yolo26n-paper2-c-o2m.yaml",
+    "a_o2m": ROOT / "ultralytics/cfg/models/26/yolo26n-paper2-a-o2m.yaml",
+    "r_o2m": ROOT / "ultralytics/cfg/models/26/yolo26n-paper2-r-o2m.yaml",
     "s1": ROOT / "ultralytics/cfg/models/26/yolo26n-japan4-s1-strip-regression.yaml",
 }
 TRAINING_PROTOCOL = {
@@ -121,8 +124,8 @@ def save_metadata(args: argparse.Namespace, model_yaml: Path, data_yaml: Path, m
         "resume_from": str(args.resume_from) if args.resume_from else None,
         "model_yaml": str(model_yaml),
         **TRAINING_PROTOCOL,
-        "loss_weights": {"o2m": 1.0 if args.candidate == "b0_o2m" else 0.8,
-                         "o2o": 0.0 if args.candidate == "b0_o2m" else 0.2, "schedule": "fixed"},
+        "loss_weights": {"o2m": 1.0 if args.candidate.endswith("_o2m") else 0.8,
+                         "o2o": 0.0 if args.candidate.endswith("_o2m") else 0.2, "schedule": "fixed"},
         "validation_branch": "O2M + class-aware NMS",
         "checkpoint_selection": "source validation AP50:95",
         "input_weights_sha256": file_sha256(args.resume_from or args.weights),

@@ -22,7 +22,7 @@ def o2m_state_sha256(model):
     """Fingerprint all shared initialized tensors, including the four-class O2M head."""
     digest = hashlib.sha256()
     for name, tensor in model.state_dict().items():
-        if "one2one" not in name:
+        if "one2one" not in name and ".strip_cv2." not in name:
             digest.update(name.encode())
             digest.update(tensor.detach().cpu().contiguous().numpy().tobytes())
     return digest.hexdigest()

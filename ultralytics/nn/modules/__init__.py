@@ -92,6 +92,8 @@ from .head import (
     Segment26,
     StripAwareResidual,
     StripDetect,
+    ConvControlDetect,
+    DeformDetect,
     StripRegionGuidedDetect,
     WorldDetect,
     YOLOEDetect,

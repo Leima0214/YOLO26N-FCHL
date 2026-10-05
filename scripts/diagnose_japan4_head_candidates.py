@@ -32,6 +32,7 @@ from ultralytics.utils.metrics import box_iou
 from ultralytics.utils.nms import non_max_suppression
 from ultralytics.utils.ops import xywh2xyxy, xyxy2xywh
 from ultralytics.utils.torch_utils import select_device
+from scripts.paper2_common import make_o2m_model
 
 
 CLASS_NAMES = ("D00", "D10", "D20", "D40")
@@ -72,6 +73,8 @@ def parse_args() -> argparse.Namespace:
         metavar="NAME=CHECKPOINT",
         help="Repeat for each checkpoint, e.g. --model B0=/path/best.pt",
     )
+    parser.add_argument("--reference", help="Generate paired per-GT gains against this model label")
+    parser.add_argument("--branches", nargs="+", choices=BRANCHES, default=list(BRANCHES))
     parser.add_argument("--data", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--imgsz", type=int, default=640)
@@ -275,6 +278,14 @@ def final_stats(
     return output
 
 
+def decode_branch(head, raw, branch):
+    raw_branch = raw["one2one" if branch == "o2o" else "one2many"] if head.end2end else raw
+    decoded = head._inference(raw_branch).float()
+    if not head.end2end:
+        decoded = torch.cat((xywh2xyxy(decoded[:, :4].transpose(1, 2)).transpose(1, 2), decoded[:, 4:]), dim=1)
+    return raw_branch, decoded
+
+
 def inspect_checkpoint(
     label: str,
     checkpoint: Path,
@@ -285,9 +296,11 @@ def inspect_checkpoint(
     device = select_device(args.device, verbose=False)
     net = wrapped.model.to(device).float().eval()
     head = net.model[-1]
-    if not isinstance(head, Detect) or not head.end2end or head.nc != len(CLASS_NAMES):
-        raise RuntimeError(f"{label}: expected four-class end-to-end Detect head")
+    if not isinstance(head, Detect) or head.nc != len(CLASS_NAMES):
+        raise RuntimeError(f"{label}: expected four-class Detect head")
 
+    if "o2o" in args.branches and not head.end2end:
+        raise ValueError("Pure O2M checkpoint requires --branches o2m")
     rows: list[dict[str, Any]] = []
     seen_images = 0
     amp = device.type == "cuda"
@@ -297,15 +310,15 @@ def inspect_checkpoint(
             with torch.autocast(device_type=device.type, enabled=amp):
                 output = net(images)
             raw = output[1] if isinstance(output, tuple) else output
-            if not isinstance(raw, dict) or not {"one2one", "one2many"}.issubset(raw):
-                raise RuntimeError(f"{label}: checkpoint did not expose both head branches")
+            if not isinstance(raw, dict):
+                raise RuntimeError(f"{label}: checkpoint did not expose raw predictions")
 
             height, width = images.shape[-2:]
             batch_indices = batch["batch_idx"].view(-1).long()
             gt_classes = batch["cls"].view(-1).long()
             gt_xywh = batch["bboxes"].float()
-            for branch, raw_branch in (("o2o", raw["one2one"]), ("o2m", raw["one2many"])):
-                decoded = head._inference(raw_branch).float()
+            for branch in args.branches:
+                raw_branch, decoded = decode_branch(head, raw, branch)
                 if branch == "o2o":
                     final_outputs = [
                         prediction[prediction[:, 4] >= args.score_floor]
@@ -321,6 +334,7 @@ def inspect_checkpoint(
                         iou_thres=0.7,
                         nc=head.nc,
                         max_det=300,
+                        multi_label=True,
                     )
                 lengths = [feature.shape[2] * feature.shape[3] for feature in raw_branch["feats"]]
                 ends = np.cumsum(lengths)
@@ -372,6 +386,8 @@ def inspect_checkpoint(
                                 "aspect_ratio": aspect,
                                 "aspect": aspect_bucket,
                                 "global_max_iou": float(ious.max()),
+                                "raw_best_level": level_for(int(ious.argmax()), ends),
+                                "input_short_side": min(box_width, box_height),
                                 "oracle_assigned_iou": float(oracle_ious[gt_index]),
                                 **{f"correct_{key}": value for key, value in correct.items() if not key.endswith("index")},
                                 **{f"any_{key}": value for key, value in any_view.items() if not key.endswith("index")},
@@ -452,7 +468,7 @@ def aggregate(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 summary[f"recall_{prefix}_iou{str(threshold).replace('.', '')}"] = mean(
                     [float(item[key] >= threshold) for item in items]
                 )
-        for level_key in ("correct_top1_level", "correct_top100_best_level", "any_top1_level", "any_top100_best_level"):
+        for level_key in ("raw_best_level", "correct_top1_level", "correct_top100_best_level", "any_top1_level", "any_top100_best_level"):
             counts = Counter(item[level_key] for item in items)
             for level in ("P3", "P4", "P5"):
                 summary[f"{level_key}_{level}_fraction"] = counts[level] / len(items)
@@ -468,6 +484,8 @@ def branch_gaps(rows: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[
 
     gaps = []
     for (model, image, gt_index, class_name), branches in paired.items():
+        if len(branches) == 1:
+            continue
         if set(branches) != set(BRANCHES):
             raise RuntimeError(f"Missing paired branch for {(model, image, gt_index, class_name)}")
         o2o, o2m = branches["o2o"], branches["o2m"]
@@ -495,6 +513,8 @@ def branch_gaps(rows: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[
         for dimension, value in (("all", "all"), ("class", row["class"]), ("size", row["size"]), ("aspect", row["aspect"])):
             grouped[(row["model"], dimension, value)].append(row)
     summary = []
+    if not gaps:
+        return [], []
     numeric = tuple(gaps[0].keys())[6:]
     for (model, dimension, value), items in sorted(grouped.items()):
         summary.append(
@@ -509,6 +529,43 @@ def branch_gaps(rows: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[
     return gaps, summary
 
 
+def operator_gains(rows, reference):
+    """Pair identical GTs; positive deltas mean improved geometry/coverage, not deployable AP."""
+    models = {}
+    for row in rows:
+        if row["branch"] != "o2m":
+            continue
+        key = (row["image"], int(row["gt_index"]), row["class"])
+        model = models.setdefault(row["model"], {})
+        if key in model:
+            raise ValueError(f"Duplicate GT key: {row['model']} {key}")
+        model[key] = row
+    if reference not in models:
+        raise ValueError(f"Missing reference model: {reference}")
+    baseline = models[reference]
+    metrics = ("global_max_iou", "correct_top100_max_iou", "correct_top1_iou", "final_correct_max_iou")
+    paired, summaries = [], []
+    for label, items in models.items():
+        if label == reference:
+            continue
+        if items.keys() != baseline.keys():
+            raise ValueError(f"GT coverage differs between {reference} and {label}")
+        for key, row in items.items():
+            native = baseline[key]
+            paired.append({"model": label, "reference": reference, "image": row["image"],
+                           "gt_index": row["gt_index"], "class": row["class"], "size": row["size"],
+                           "aspect": row["aspect"],
+                           **{f"delta_{metric}": row[metric] - native[metric] for metric in metrics}})
+        for dimension in ("all", "class", "size", "aspect"):
+            values = ["all"] if dimension == "all" else sorted({r[dimension] for r in paired if r["model"] == label})
+            for value in values:
+                group = [r for r in paired if r["model"] == label and (dimension == "all" or r[dimension] == value)]
+                summaries.append({"model": label, "reference": reference, "dimension": dimension,
+                                  "value": value, "n_gt": len(group),
+                                  **{f"mean_delta_{metric}": mean([r[f"delta_{metric}"] for r in group]) for metric in metrics}})
+    return paired, summaries
+
+
 def write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
     if not rows:
         raise RuntimeError(f"No rows generated for {path}")
@@ -521,13 +578,15 @@ def write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
 def validation_sweep(models: dict[str, Path], data_yaml: Path, output: Path, args: argparse.Namespace) -> list[dict[str, Any]]:
     rows = []
     for label, checkpoint in models.items():
-        settings = [("o2o", 0.7), ("o2m", 0.5), ("o2m", 0.6), ("o2m", 0.7)]
+        settings = [(branch, iou) for branch, iou in
+                    (("o2o", 0.7), ("o2m", 0.5), ("o2m", 0.6), ("o2m", 0.7)) if branch in args.branches]
         for branch, nms_iou in settings:
             model = YOLO(str(checkpoint))
             head = model.model.model[-1]
             if branch == "o2m":
-                del head.one2one_cv2
-                del head.one2one_cv3
+                model.model = make_o2m_model(model.model)
+            elif not head.end2end:
+                raise ValueError("Pure O2M checkpoint requires --branches o2m")
             metrics = model.val(
                 data=str(data_yaml),
                 imgsz=args.imgsz,
@@ -568,6 +627,8 @@ def main() -> None:
         raise FileNotFoundError(args.data)
     if args.topk < 10 or not 0 <= args.score_floor <= 1:
         raise ValueError("--topk must be >=10 and --score-floor must be in [0,1]")
+    if args.output.exists() and any(args.output.iterdir()):
+        raise FileExistsError(f"Refusing to overwrite diagnostic output: {args.output}")
     args.output.mkdir(parents=True, exist_ok=True)
     data, loader = make_loader(args.data, args)
 
@@ -577,10 +638,16 @@ def main() -> None:
         rows.extend(inspect_checkpoint(label, checkpoint, loader, args))
     summaries = aggregate(rows)
     gaps, gap_summaries = branch_gaps(rows)
+    if args.reference:
+        paired, paired_summary = operator_gains(rows, args.reference)
+        if paired:
+            write_csv(args.output / "paired_operator_gains.csv", paired)
+            write_csv(args.output / "paired_operator_summary.csv", paired_summary)
     write_csv(args.output / "per_gt_candidates.csv", rows)
     write_csv(args.output / "candidate_summary.csv", summaries)
-    write_csv(args.output / "o2m_to_o2o_per_gt.csv", gaps)
-    write_csv(args.output / "o2m_to_o2o_summary.csv", gap_summaries)
+    if gaps:
+        write_csv(args.output / "o2m_to_o2o_per_gt.csv", gaps)
+        write_csv(args.output / "o2m_to_o2o_summary.csv", gap_summaries)
 
     sweep = [] if args.skip_val_sweep or args.max_images else validation_sweep(models, args.data, args.output, args)
     if sweep:
@@ -595,10 +662,11 @@ def main() -> None:
             "topk": args.topk,
             "score_floor": args.score_floor,
             "size_definition": "model-input pixels: small < 32^2, medium < 96^2, large otherwise",
-            "branches": list(BRANCHES),
+            "branches": args.branches,
             "note": (
                 "Candidates are uniquely owned by the overlapping nearest peer GT before local ranking metrics. "
-                "Oracle AP uses GT assignment and perfect reranking as a macro class upper bound, never deployable AP."
+                "Oracle assigned recall uses GT assignment as a diagnostic upper bound; it is not AP. "
+                "Nearest-owner final candidate coverage is not official COCO recall."
             ),
         },
         "weights": {label: {"path": str(path), "sha256": sha256(path)} for label, path in models.items()},

@@ -199,6 +199,9 @@ def main() -> None:
                 "AR100": ar100(all_eval),
                 "params": parameters,
                 "GFLOPs": gflops,
+                "GFLOPs_note": "THOP estimate excludes deformable sampling/interpolation cost"
+                if any(type(module).__name__ == "DeformConv2d" for module in model.model.modules())
+                else "THOP estimate",
                 "pytorch_batch1_latency_ms": latency_ms(model.model, device, args.imgsz),
                 "checkpoint_MB": checkpoint.stat().st_size / 2**20,
             }

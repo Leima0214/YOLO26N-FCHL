@@ -1303,8 +1303,8 @@
       "source": "ultralytics/nn/modules/__init__.py",
       "destination": "ultralytics/nn/modules/__init__.py",
       "source_sha256": "0395eaa3ef993bdb81652d987665ccd8568ad9ba463132a3b720f3c2e9044459",
-      "destination_sha256": "0395eaa3ef993bdb81652d987665ccd8568ad9ba463132a3b720f3c2e9044459",
-      "modified": false
+      "destination_sha256": "f0f899cb4e5ed2cae4ecfa78c51bc1ce91431e8c9e14f9b7c56bd3b1f04e10e6",
+      "modified": true
     },
     {
       "source": "ultralytics/nn/modules/activation.py",
@@ -1331,8 +1331,8 @@
       "source": "ultralytics/nn/modules/head.py",
       "destination": "ultralytics/nn/modules/head.py",
       "source_sha256": "e6a01560ad5988ae3a6063751525d2e731aaf7a10d337b78b0fe53721d10214d",
-      "destination_sha256": "e6a01560ad5988ae3a6063751525d2e731aaf7a10d337b78b0fe53721d10214d",
-      "modified": false
+      "destination_sha256": "607b3b806df99d1d3b5e86b5dbd548a84d15d0a558fe8b284e9a50cbc8cfb3aa",
+      "modified": true
     },
     {
       "source": "ultralytics/nn/modules/moe/__init__.py",
@@ -1548,8 +1548,8 @@
       "source": "ultralytics/nn/tasks.py",
       "destination": "ultralytics/nn/tasks.py",
       "source_sha256": "e9b8de4df36d26175403ef710d311db40f490e779019925b09158126810e0c37",
-      "destination_sha256": "e9b8de4df36d26175403ef710d311db40f490e779019925b09158126810e0c37",
-      "modified": false
+      "destination_sha256": "22aab07877a4839ae19eee50a97e197a9aee8aa584b0aed7406c2a10e43adad2",
+      "modified": true
     },
     {
       "source": "ultralytics/nn/text_model.py",
@@ -2318,7 +2318,7 @@
       "source": "scripts/diagnose_japan4_head_candidates.py",
       "destination": "scripts/diagnose_japan4_head_candidates.py",
       "source_sha256": "35c05633e48e354b1bae7253282eeeb2b25988495aed4108b0480a498ef00f59",
-      "destination_sha256": "86e5d12d7bc4468c3e522632687f9fb3f362b9f8f6ca2304425d83da3b8df81c",
+      "destination_sha256": "5263f3fc9f1c319bc384937dfca8987eec2500eae545c7993bb9f1d44b0aeeef",
       "modified": true
     },
     {
@@ -2346,14 +2346,14 @@
       "source": "scripts/train_japan4_candidate.py",
       "destination": "scripts/train_paper2.py",
       "source_sha256": "7333b76a54b07f863ae0be92f3aa9c5ee83cf83127393f14e318a7f98955e9e7",
-      "destination_sha256": "c0df842395ec23d75301c013642ebb94339c76c8c3a9279a3f46de1aefdc160f",
+      "destination_sha256": "3c22a6eb61b236d8601c3333c919f0fe84ca09e91245a52c899b4948d2cca74a",
       "modified": true
     },
     {
       "source": "scripts/eval_japan4_candidate.py",
       "destination": "scripts/eval_paper2.py",
       "source_sha256": "c90b1298d681a54c0ef25c895511d6a65b45b4e95ba563c68eda32c96cfdfea9",
-      "destination_sha256": "430881723e34067ee636439ccdd79db52139cf6aff03a90093e73d0f62c44499",
+      "destination_sha256": "b0cb517222879c624a4dae158ea85fb6219bf452e4f401cd06165944f07eed64",
       "modified": true
     }
   ]
