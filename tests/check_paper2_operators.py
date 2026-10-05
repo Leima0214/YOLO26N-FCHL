@@ -16,7 +16,7 @@ from ultralytics.nn.autobackend import AutoBackend
 from ultralytics.nn.tasks import DetectionModel
 from ultralytics.utils.loss import v8DetectionLoss
 from ultralytics.utils.ops import xywh2xyxy
-from ultralytics.utils.torch_utils import init_seeds
+from ultralytics.utils.torch_utils import get_flops, init_seeds
 from scripts.diagnose_japan4_head_candidates import branch_gaps, decode_branch, operator_gains
 from scripts.paper2_common import O2MValidator, make_o2m_model, o2m_state_sha256
 from scripts.train_paper2 import MODELS
@@ -64,6 +64,15 @@ def main():
         model = DetectionModel(str(MODELS[candidate]), nc=4, verbose=False).float()
         model.load(source, verbose=False)
         model.args = get_cfg()
+        profile_inputs = []
+
+        def check_profile_input(module, inputs):
+            assert torch.isfinite(inputs[0]).all() and (inputs[0] == 0).all()
+            profile_inputs.append(True)
+
+        hook = model.register_forward_pre_hook(check_profile_input)
+        assert get_flops(model) > 0 and profile_inputs
+        hook.remove()
         model.to(device).eval()
         assert not model.end2end and isinstance(model.init_criterion(), v8DetectionLoss)
         assert model.stride.tolist() == [8., 16., 32.]

@@ -2255,8 +2255,8 @@
       "source": "ultralytics/utils/torch_utils.py",
       "destination": "ultralytics/utils/torch_utils.py",
       "source_sha256": "1dd2e9bd46c2c39e651648661223b968107db69ce17c991bea364ca330fd6ce5",
-      "destination_sha256": "1dd2e9bd46c2c39e651648661223b968107db69ce17c991bea364ca330fd6ce5",
-      "modified": false
+      "destination_sha256": "8165baeb7da3c296de5654065aaec845594f7214fbec8a80be47d6877d2d8e6a",
+      "modified": true
     },
     {
       "source": "ultralytics/utils/tqdm.py",

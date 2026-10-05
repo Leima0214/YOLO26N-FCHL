@@ -1,5 +1,6 @@
 """Authorized C/A/R screening queue: preflight, independent smoke, fresh 30E and paired Val evidence."""
 
+import argparse
 import csv
 import json
 import os
@@ -49,9 +50,18 @@ def prepare_morphology_subset():
 
 
 def main():
-    OUT.mkdir(parents=True, exist_ok=False)
-    status = {"pid": os.getpid(), "state": "starting", "stages": [],
-              "test_sealed": True, "automatic_monitoring": False}
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--resume-preflight", action="store_true", help="Continue a failed preflight after an explicit repair")
+    args = parser.parse_args()
+    OUT.mkdir(parents=True, exist_ok=args.resume_preflight)
+    if args.resume_preflight:
+        status = json.loads((OUT / "status.json").read_text())
+        assert status["state"] == "failed" and status["stage"].startswith("smoke_"), status
+        status["previous_failure"] = {key: status.pop(key) for key in ("error", "finished_at")}
+        status.update(pid=os.getpid(), state="starting")
+    else:
+        status = {"pid": os.getpid(), "state": "starting", "stages": [],
+                  "test_sealed": True, "automatic_monitoring": False}
 
     def save():
         temp = OUT / "status.tmp"
@@ -59,6 +69,10 @@ def main():
         temp.replace(OUT / "status.json")
 
     def run(stage, args):
+        if stage not in ("migration_check", "operator_engineering") and any(
+            record["stage"] == stage and record.get("exit_code") == 0 for record in status["stages"]
+        ):
+            return
         record = {"stage": stage, "command": [sys.executable, "-u", *map(str, args)], "started_at": time.time()}
         status["stages"].append(record)
         status.update(state="running", stage=stage)
