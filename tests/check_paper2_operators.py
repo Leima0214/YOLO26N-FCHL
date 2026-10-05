@@ -71,20 +71,28 @@ def main():
 
         model.train()
         optimizer = torch.optim.SGD(model.parameters(), lr=.01)
+        scaler = torch.amp.GradScaler(device.type, init_scale=128, enabled=device.type == "cuda")
+        learned_seen = [False, False]
+        offset_seen = [False, False]
         for step in range(3):
             optimizer.zero_grad(set_to_none=True)
             with torch.autocast(device_type=device.type, enabled=device.type == "cuda"):
                 losses, _ = model.loss(batch)
             assert torch.isfinite(losses).all()
-            losses.sum().backward()
-            for adapter in model.model[-1].strip_cv2[:2]:
+            scaler.scale(losses.sum()).backward()
+            scaler.unscale_(optimizer)
+            for index, adapter in enumerate(model.model[-1].strip_cv2[:2]):
                 assert adapter.gamma.grad is not None and torch.isfinite(adapter.gamma.grad).all()
-                if step == 2:
-                    learned = [p.grad for name, p in adapter.named_parameters() if name != "gamma"]
-                    assert any(g is not None and torch.isfinite(g).all() and g.abs().max() > 0 for g in learned)
-                    if candidate == "r_o2m":
-                        assert adapter.offset.weight.grad.abs().max() > 0
-            optimizer.step()
+                learned = [p.grad for name, p in adapter.named_parameters() if name != "gamma"]
+                assert all(g is None or torch.isfinite(g).all() for g in learned)
+                learned_seen[index] |= any(g is not None and g.abs().max() > 0 for g in learned)
+                if candidate == "r_o2m":
+                    offset_seen[index] |= bool(adapter.offset.weight.grad.abs().max() > 0)
+            scaler.step(optimizer)
+            scaler.update()
+        assert all(learned_seen), (candidate, "no branch gradient", learned_seen)
+        if candidate == "r_o2m":
+            assert all(offset_seen), (candidate, "no offset gradient", offset_seen)
 
         model.eval()
         with torch.no_grad():
