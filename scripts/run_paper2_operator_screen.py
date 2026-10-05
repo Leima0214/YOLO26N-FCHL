@@ -98,8 +98,9 @@ def main():
         run("baseline_diagnostic", ["scripts/diagnose_japan4_head_candidates.py", "--model", f"B0={BASELINE}/weights/best.pt",
                                     "--data", DATA, "--output", OUT / "baseline_diagnostic", "--branches", "o2m",
                                     "--skip-val-sweep", "--workers", "8"])
-        status["human_subset_GT_count"] = prepare_morphology_subset()
-        status["human_subset_annotated"] = False
+        if not (OUT / "morphology_subset.csv").exists():
+            status["human_subset_GT_count"] = prepare_morphology_subset()
+            status["human_subset_annotated"] = False
         reference = json.loads((ROOT / "runtime_meta" / BASELINE_NAME / "effective_optimizer.json").read_text())
         reference_args = json.loads((ROOT / "runtime_meta" / BASELINE_NAME / "resolved_arguments.json").read_text())
         for tag in "CAR":
