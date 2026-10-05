@@ -18,6 +18,8 @@ This is a single-seed 30E feasibility screen. It tests whether regression refine
 
 Engineering checks cover identity initialization, shared tensors, gradient flow (including R offsets), CUDA AMP, half-precision validation, fusion, save/load, and pure-O2M decoding. Independent 1E smokes check the actual dataset/trainer; their AP is not scientific evidence.
 
+R's torchvision CUDA deformable backward reports a nondeterministic implementation under PyTorch's `warn_only=True` deterministic setting. The common seed/protocol is preserved, but bitwise repeatability is not claimed. Fusion equivalence is checked with TF32 disabled in the engineering process only; production retains B0's arithmetic settings.
+
 Before training, B0 Val diagnostics record unfiltered best-IoU candidate, its P3/P4/P5 level, score-ranked candidates and final NMS candidate coverage. A deterministic 200-GT class/size sample is prepared for human morphology review. The morphology fields remain blank until a person examines the images. Class ID and HBB aspect ratio do not establish linear/network/region morphology.
 
 After sequential C -> A -> R 30E, the queue evaluates all four selected checkpoints with identical standalone Val settings: batch32, rect, conf0.001, NMS IoU0.7, validator max_det300; COCO maxDets100. Native training and standalone fused saved-checkpoint metrics are reported separately. COCO AP50:95 is the primary comparison; AP75, per-class AP, small/medium/large AP, recall, parameters and latency expose tradeoffs. R's THOP estimate excludes deformable sampling/interpolation cost; it is not a complete FLOP count.
