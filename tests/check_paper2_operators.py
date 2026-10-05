@@ -16,6 +16,7 @@ from ultralytics.nn.autobackend import AutoBackend
 from ultralytics.nn.tasks import DetectionModel
 from ultralytics.utils.loss import v8DetectionLoss
 from ultralytics.utils.ops import xywh2xyxy
+from ultralytics.utils.torch_utils import init_seeds
 from scripts.diagnose_japan4_head_candidates import branch_gaps, decode_branch, operator_gains
 from scripts.paper2_common import O2MValidator, make_o2m_model, o2m_state_sha256
 from scripts.train_paper2 import MODELS
@@ -29,6 +30,10 @@ def main():
     args = parser.parse_args()
     torch.set_num_threads(2)
     device = torch.device(args.device)
+    init_seeds(42, deterministic=True)
+    # Compare fusion in FP32 arithmetic; production retains B0's TF32 settings.
+    torch.backends.cudnn.allow_tf32 = False
+    torch.backends.cuda.matmul.allow_tf32 = False
     source = YOLO(str(args.weights)).model.float()
     torch.manual_seed(42)
     baseline = DetectionModel(str(MODELS["b0_o2m"]), nc=4, verbose=False).float()
