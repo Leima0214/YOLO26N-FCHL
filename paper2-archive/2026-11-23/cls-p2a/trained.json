@@ -1,0 +1,9 @@
+{
+  "time": "2026-11-21T18:53:27.102318-08:00",
+  "epochs": 100,
+  "primary": 600000,
+  "parent_family": "HistoricalCLS",
+  "state_sha": "8572054e923511102340d91c8d72c789a2d8219ca2e7f62b4f4cd9d507d71385",
+  "close_mosaic": 10,
+  "quad_best_saving": true
+}

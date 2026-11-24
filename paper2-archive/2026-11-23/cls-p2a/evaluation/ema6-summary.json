@@ -1,0 +1,142 @@
+{
+  "scope": "SVRDD7 Val; seed42; original 640 EMA6 result",
+  "source": "diagnostics/p2p3_switches_and_ema_avg_42233.json",
+  "source_sha256": "2a50bfe292ba604541caa9f0e31d6561c442d5d8bde6ed3946e48fc7c2bf6c17",
+  "val_gt_sha256_prefix": "b9e37fda5a194051",
+  "eval_protocol": "SVRDD7 Val 1000 imgs / 2612 GTs, FP32 O2M + class-aware NMS iou=0.70, conf=0.001, rect=True, batch=32, COCO maxDets=100",
+  "ema6": {
+    "snapshots": [
+      60,
+      65,
+      70,
+      75,
+      80,
+      85
+    ],
+    "snapshot_shas_12": {
+      "60": "e25a42ef8c46",
+      "65": "f4af9b35d59c",
+      "70": "d273244b26f7",
+      "75": "43321fb70844",
+      "80": "b82ca126f207",
+      "85": "57a4c034d582"
+    },
+    "tensor_counts": {
+      "float": 825,
+      "non_float_from_e85": 150
+    },
+    "eval_640": {
+      "imgsz": 640,
+      "batch": 32,
+      "predictions": 81449,
+      "pred_sha256_prefix": "df8266b7ef08fab8",
+      "main": {
+        "AP50_95": 43.709,
+        "AP50": 70.25,
+        "AP75": 45.456,
+        "AP_small": 21.872,
+        "AP_medium": 36.324,
+        "AP_large": 59.033,
+        "AR100": 62.018
+      },
+      "classes": {
+        "LC": {
+          "AP50_95": 42.31,
+          "AP50": 65.2,
+          "AP75": 45.21,
+          "AP_large": 53.66,
+          "AR100": 64.8
+        },
+        "TC": {
+          "AP50_95": 35.06,
+          "AP50": 63.25,
+          "AP75": 33.44,
+          "AP_large": 47.82,
+          "AR100": 58.97
+        },
+        "AC": {
+          "AP50_95": 49.28,
+          "AP50": 76.27,
+          "AP75": 51.29,
+          "AP_large": 52.55,
+          "AR100": 63.92
+        },
+        "P": {
+          "AP50_95": 34.85,
+          "AP50": 62.56,
+          "AP75": 31.21,
+          "AP_large": 42.28,
+          "AR100": 56.17
+        },
+        "MC": {
+          "AP50_95": 51.43,
+          "AP50": 81.28,
+          "AP75": 58.19,
+          "AP_large": 90.0,
+          "AR100": 62.75
+        },
+        "LP": {
+          "AP50_95": 51.37,
+          "AP50": 75.73,
+          "AP75": 55.98,
+          "AP_large": 66.16,
+          "AR100": 66.47
+        },
+        "TP": {
+          "AP50_95": 41.66,
+          "AP50": 67.45,
+          "AP75": 42.87,
+          "AP_large": 60.76,
+          "AR100": 61.04
+        }
+      }
+    },
+    "vs_own_best": {
+      "AP50_95": 0.475,
+      "AP50": 0.617,
+      "AP75": 0.503,
+      "AP_small": 0.36,
+      "AP_medium": 0.339,
+      "AP_large": 0.252,
+      "AR100": 0.753
+    },
+    "vs_own_best_ap50": {
+      "AP50_95": 1.009,
+      "AP50": 0.568,
+      "AP75": 1.571,
+      "AP_small": 1.338,
+      "AP_medium": 1.002,
+      "AP_large": 0.357,
+      "AR100": 0.232
+    },
+    "vs_own_last_e100": {
+      "AP50_95": 0.956,
+      "AP50": 1.35,
+      "AP75": 1.305,
+      "AP_small": 1.359,
+      "AP_medium": 0.586,
+      "AP_large": -0.435,
+      "AR100": 1.544
+    },
+    "own_best_epoch": 90,
+    "own_best_main": {
+      "AP50_95": 43.234,
+      "AP50": 69.633,
+      "AP75": 44.953,
+      "AP_small": 21.512,
+      "AP_medium": 35.985,
+      "AP_large": 58.781,
+      "AR100": 61.265
+    },
+    "own_last_main": {
+      "AP50_95": 42.753,
+      "AP50": 68.9,
+      "AP75": 44.151,
+      "AP_small": 20.513,
+      "AP_medium": 35.738,
+      "AP_large": 59.468,
+      "AR100": 60.474
+    }
+  },
+  "note": "Epoch files are zero-indexed source checkpoint filenames. Model snapshots are stored in the local research archive. The best.pt in this directory is the independently evaluated single checkpoint."
+}

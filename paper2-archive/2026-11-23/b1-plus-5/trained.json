@@ -1,0 +1,10 @@
+{
+  "time": "2026-11-23T19:19:48.334646-08:00",
+  "epochs": 100,
+  "seed": 42,
+  "close_mosaic": 10,
+  "primary": 600000,
+  "parent_family": "CLS-P2A",
+  "state_sha": "b91576e3925d558d03eba9a4665879bfcd408aeacd5121fcc1c3c4167f390855",
+  "quad_best_saving": true
+}

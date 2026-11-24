@@ -1,0 +1,135 @@
+{
+  "b1_w50": {
+    "params": 3246130,
+    "deployed_o2m_params": 3067810,
+    "state_sha": "b91576e3925d558d03eba9a4665879bfcd408aeacd5121fcc1c3c4167f390855",
+    "matches_b1_initial_exact": true
+  },
+  "p2a_w50": {
+    "params": 3208050,
+    "state_sha": "8572054e923511102340d91c8d72c789a2d8219ca2e7f62b4f4cd9d507d71385",
+    "matches_p2a_initial_exact": true
+  },
+  "breakpoint_640": {
+    "top_h": 256,
+    "bot_h": 384,
+    "stride32_aligned": true,
+    "eff_top_frac": 0.4
+  },
+  "gate2_synthetic_align": {
+    "max_err_px": 0.0,
+    "roundtrip_err": 0.0,
+    "rects": {
+      "upper": {
+        "obs": [
+          50.0,
+          90.0
+        ],
+        "exp": [
+          50.0,
+          90.0
+        ],
+        "err_px": 0.0
+      },
+      "lower_narrow": {
+        "obs": [
+          322.0,
+          328.0
+        ],
+        "exp": [
+          322.0,
+          328.0
+        ],
+        "err_px": 0.0
+      },
+      "straddle_horizon": {
+        "obs": [
+          240.0,
+          292.0
+        ],
+        "exp": [
+          240.0,
+          292.0
+        ],
+        "err_px": 0.0
+      }
+    }
+  },
+  "gate3_no_double_warp_and_close_mosaic_ok": true,
+  "gate4_cpu_latency_ms": {
+    "uniform_resize": 0.9863,
+    "warp50": 1.1111,
+    "delta": 0.1247
+  },
+  "gate5_pre_nms_raw_parity": {
+    "img_diff": 0,
+    "box_diff": 0.0,
+    "score_diff": 0.0
+  },
+  "gate6_smoke_8img_256_384": {
+    "640": {
+      "preds": 283,
+      "native_mAP50_pct": 94.687,
+      "native_mAP50_95_pct": 70.054
+    },
+    "768": {
+      "preds": 268,
+      "native_mAP50_pct": 97.3,
+      "native_mAP50_95_pct": 70.028
+    },
+    "coco_selector_640": {
+      "AP50_95": 70.19,
+      "AP50": 95.091,
+      "AP75": 80.104,
+      "AR100": 75.556
+    }
+  },
+  "gate7_identity_320_parity_1000": {
+    "CLS_P2A": {
+      "max_diff_pp": 0.00166,
+      "diffs_pp": {
+        "AP50_95": 6e-05,
+        "AP50": 9e-05,
+        "AP75": 3e-05,
+        "AR100": 0.0,
+        "AP_small": 0.00042,
+        "AP_medium": 0.00034,
+        "AP_large": 0.0
+      },
+      "native_diff_pp": 0.00166
+    },
+    "b1": {
+      "max_diff_pp": 0.01084,
+      "diffs_pp": {
+        "AP50_95": 0.00615,
+        "AP50": 0.01073,
+        "AP75": 0.00453,
+        "AR100": 0.0,
+        "AP_small": 0.00872,
+        "AP_medium": 0.00115,
+        "AP_large": 0.0
+      },
+      "native_diff_pp": 0.01084
+    }
+  },
+  "gate8_amp_musgd_steps": 4,
+  "gate8_side_weight_max_deltas": {
+    "reduce.conv.weight": 0.00010227039456367493,
+    "deconv.vc.weight": 5.66430389881134e-05,
+    "deconv.cdc.weight": 6.062164902687073e-05,
+    "deconv.adc.weight": 6.646756082773209e-05,
+    "deconv.hdc.weight": 7.157027721405029e-05,
+    "deconv.vdc.weight": 8.489936590194702e-05,
+    "proj.weight": 0.0004591081233229488
+  },
+  "gate8_post_update_fuse_parity": {
+    "480x640": {
+      "box_err_px": 0.0013275146484375,
+      "score_err": 1.1641532182693481e-09
+    },
+    "768x768": {
+      "box_err_px": 0.00177001953125,
+      "score_err": 1.1641532182693481e-09
+    }
+  }
+}
