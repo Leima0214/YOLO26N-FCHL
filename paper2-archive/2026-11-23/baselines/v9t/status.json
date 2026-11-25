@@ -1,0 +1,24 @@
+{
+  "time": "2026-11-25T00:59:34.884795-08:00",
+  "epoch": 100,
+  "primary": 6000,
+  "seconds": 44.476068855961785,
+  "successful_steps": 9530,
+  "amp_skips": 11,
+  "metrics": {
+    "metrics/precision(B)": 0.70818,
+    "metrics/recall(B)": 0.64234,
+    "metrics/mAP50(B)": 0.68546,
+    "metrics/mAP50-95(B)": 0.41642,
+    "metrics/AP75(B)": 0.43818,
+    "val/box_loss": 1.30534,
+    "val/cls_loss": 1.09673,
+    "val/dfl_loss": 1.29888,
+    "COCO/AP50_95": 0.4144862046784661,
+    "COCO/AP50": 0.6823917883377874,
+    "COCO/AP75": 0.43529583691712304,
+    "COCO/AR100": 0.5972323707740151
+  },
+  "peak_allocated_GiB": 4.7790703773498535,
+  "peak_reserved_GiB": 5.712890625
+}

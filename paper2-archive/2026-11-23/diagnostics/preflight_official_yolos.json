@@ -1,0 +1,167 @@
+{
+  "time": "2026-11-24T22:07:34.200514-08:00",
+  "passed": true,
+  "gpu": "NVIDIA GeForce RTX 4090 D",
+  "arms": {
+    "v8n": {
+      "arm": "v8n",
+      "label": "YOLOv8n",
+      "primary_mode": "o2m",
+      "optimizer": "AdamW",
+      "lr0": 0.000909,
+      "losses": [
+        [
+          3.0882,
+          6.0973,
+          2.5517
+        ],
+        [
+          2.7463,
+          5.7233,
+          2.6403
+        ]
+      ],
+      "changed_tensors": 114,
+      "peak_reserved_GiB": 3.814,
+      "train_params": 3012213,
+      "deployed_params": 3007013,
+      "gflops": 8.092,
+      "smoke_primary_preds": 2400,
+      "smoke_secondary_preds": null
+    },
+    "v9t": {
+      "arm": "v9t",
+      "label": "YOLOv9t",
+      "primary_mode": "o2m",
+      "optimizer": "AdamW",
+      "lr0": 0.000909,
+      "losses": [
+        [
+          3.2217,
+          6.3009,
+          2.5244
+        ],
+        [
+          2.6952,
+          5.5269,
+          2.6338
+        ]
+      ],
+      "changed_tensors": 442,
+      "peak_reserved_GiB": 5.074,
+      "train_params": 2006773,
+      "deployed_params": 1972741,
+      "gflops": 7.611,
+      "smoke_primary_preds": 2400,
+      "smoke_secondary_preds": null
+    },
+    "v10n": {
+      "arm": "v10n",
+      "label": "YOLOv10n",
+      "primary_mode": "o2o",
+      "optimizer": "AdamW",
+      "lr0": 0.000909,
+      "losses": [
+        [
+          2.8504,
+          10.7379,
+          2.3392
+        ],
+        [
+          2.5108,
+          10.1508,
+          2.4462
+        ]
+      ],
+      "changed_tensors": 190,
+      "peak_reserved_GiB": 5.271,
+      "train_params": 2709770,
+      "deployed_params": 2269093,
+      "gflops": 6.536,
+      "smoke_primary_preds": 2400,
+      "smoke_secondary_preds": 2400
+    },
+    "y11n": {
+      "arm": "y11n",
+      "label": "YOLO11n",
+      "primary_mode": "o2m",
+      "optimizer": "AdamW",
+      "lr0": 0.000909,
+      "losses": [
+        [
+          3.0531,
+          6.0884,
+          2.4397
+        ],
+        [
+          2.5771,
+          5.5669,
+          2.4964
+        ]
+      ],
+      "changed_tensors": 162,
+      "peak_reserved_GiB": 4.207,
+      "train_params": 2591205,
+      "deployed_params": 2583517,
+      "gflops": 6.319,
+      "smoke_primary_preds": 2400,
+      "smoke_secondary_preds": null
+    },
+    "y12n": {
+      "arm": "y12n",
+      "label": "YOLO12n",
+      "primary_mode": "o2m",
+      "optimizer": "AdamW",
+      "lr0": 0.000909,
+      "losses": [
+        [
+          3.2195,
+          6.2554,
+          2.5571
+        ],
+        [
+          2.6246,
+          5.5091,
+          2.737
+        ]
+      ],
+      "changed_tensors": 226,
+      "peak_reserved_GiB": 6.16,
+      "train_params": 2569413,
+      "deployed_params": 2558093,
+      "gflops": 6.326,
+      "smoke_primary_preds": 2400,
+      "smoke_secondary_preds": null
+    },
+    "y26s": {
+      "arm": "y26s",
+      "label": "YOLO26s",
+      "primary_mode": "o2m",
+      "optimizer": "MuSGD",
+      "lr0": 0.01,
+      "losses": [
+        [
+          2.8785,
+          35.5863,
+          0.0233
+        ],
+        [
+          2.5153,
+          34.25,
+          0.0247
+        ]
+      ],
+      "changed_tensors": 228,
+      "peak_reserved_GiB": 9.09,
+      "train_params": 9953282,
+      "deployed_params": 9467889,
+      "gflops": 20.535,
+      "smoke_primary_preds": 2400,
+      "smoke_secondary_preds": 2400
+    }
+  },
+  "full_val": {
+    "images": 1000,
+    "instances": 2612
+  }
+}

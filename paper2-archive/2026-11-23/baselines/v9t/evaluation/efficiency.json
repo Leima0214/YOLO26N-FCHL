@@ -1,0 +1,22 @@
+{
+  "primary": {
+    "arm": "v9t",
+    "label": "YOLOv9t",
+    "mode": "o2m",
+    "imgsz": 640,
+    "gpu": "NVIDIA GeForce RTX 4090 D",
+    "n_e2e_imgs": 200,
+    "train_params": 2006773,
+    "deploy_params": 1972741,
+    "gflops": 7.611,
+    "gpu_fp32_bs1_ms": 14.038,
+    "gpu_fp32_bs32_ms": 0.577,
+    "gpu_fp16_bs1_ms": 14.623,
+    "gpu_fp16_bs32_ms": 0.471,
+    "e2e_bs1_ms": 17.616,
+    "e2e_bs1_fps": 56.77,
+    "e2e_pre_ms": 2.683,
+    "e2e_fwd_ms": 14.057,
+    "e2e_post_ms": 0.876
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "time": "2026-11-25T00:59:45.021471-08:00",
+  "arm": "v9t",
+  "label": "YOLOv9t",
+  "epochs": 100,
+  "seed": 42,
+  "imgsz": 640,
+  "primary_mode": "o2m",
+  "primary": 600000,
+  "state_sha": "11001388f28929b65e65a18cf38feb9e4606abc2b7bcda4b64a14f4a1dd8885b",
+  "quad_best_saving": true
+}

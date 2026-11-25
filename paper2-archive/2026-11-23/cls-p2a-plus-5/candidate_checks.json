@@ -1,0 +1,34 @@
+{
+  "arm": "p2a_w50",
+  "seed": 42,
+  "params": 3208050,
+  "added_over_p2a": 0,
+  "added": 12376,
+  "inherited_p2a_tensors": 975,
+  "protocol_overrides": {},
+  "checks": {
+    "step0_vs_p2a_rect_128x160": {
+      "one2many": {
+        "boxes": 0.0,
+        "scores": 0.0
+      },
+      "one2one": {
+        "boxes": 0.0,
+        "scores": 0.0
+      }
+    },
+    "step0_vs_p2a_rect_416x640": {
+      "one2many": {
+        "boxes": 0.0,
+        "scores": 0.0
+      },
+      "one2one": {
+        "boxes": 0.0,
+        "scores": 0.0
+      }
+    },
+    "deployed_o2m_params": 3054370,
+    "warp_roundtrip_max_err": 6.938893903907228e-18,
+    "inherits_schemeA_p2_initial_exact": true
+  }
+}

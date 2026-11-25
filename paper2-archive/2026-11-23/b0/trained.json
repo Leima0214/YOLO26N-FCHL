@@ -1,0 +1,11 @@
+{
+  "time": "2026-11-24T00:14:47.661259-08:00",
+  "epochs": 100,
+  "seed": 42,
+  "imgsz": 640,
+  "close_mosaic": 10,
+  "primary": 600000,
+  "parent_desc": "PublicYOLO26n+B0_initial(B0_initial_seed42.pt)",
+  "state_sha": "0fed01ea204dc51360b360973ad25b947a8ac831b735619f05c4c9545b4cd99a",
+  "quad_best_saving": true
+}

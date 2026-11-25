@@ -1,0 +1,11 @@
+{
+  "time": "2026-11-24T04:02:36.915340-08:00",
+  "epochs": 100,
+  "seed": 42,
+  "imgsz": 640,
+  "close_mosaic": 10,
+  "primary": 600000,
+  "parent_desc": "HistoricalCLS minus PKI2",
+  "state_sha": "78dde19281949988895b80b4494fb7d480d665e030aa32439aa0b5584b2e6482",
+  "quad_best_saving": true
+}

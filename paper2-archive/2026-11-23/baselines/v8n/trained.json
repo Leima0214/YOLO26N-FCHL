@@ -1,0 +1,12 @@
+{
+  "time": "2026-11-24T23:25:08.515992-08:00",
+  "arm": "v8n",
+  "label": "YOLOv8n",
+  "epochs": 100,
+  "seed": 42,
+  "imgsz": 640,
+  "primary_mode": "o2m",
+  "primary": 600000,
+  "state_sha": "4202c7836b2e153ad86840c8c4b32fa744cb9c27d9e9a894b65908a8dadab895",
+  "quad_best_saving": true
+}

@@ -1,0 +1,14 @@
+{
+  "label": "YOLOv9t",
+  "primary_mode": "o2m",
+  "head_type": "Detect",
+  "reg_max": 16,
+  "end2end": false,
+  "inherited_tensors": 1303,
+  "total_tensors": 1339,
+  "reinitialized_tensors": 36,
+  "inherited_numel_ratio": 0.861867,
+  "backbone_neck_inherited_ratio": 1.0,
+  "train_params": 2006773,
+  "deployed_params": 1972741
+}

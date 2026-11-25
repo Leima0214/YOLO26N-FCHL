@@ -1,0 +1,36 @@
+{
+  "arm": "b0_w50",
+  "seed": 42,
+  "imgsz": 640,
+  "parent_desc": "PublicYOLO26n+B0_initial(B0_initial_seed42.pt)",
+  "params": 2506530,
+  "warp": [
+    0.5,
+    0.4
+  ],
+  "protocol_overrides": {},
+  "checks": {
+    "matches_public_yolo26n_all_606_tensors": true,
+    "matches_b0_init_exact": true,
+    "unfused_o2m_params": 2384577,
+    "deployed_o2m_params": 2376201,
+    "b0_end2end_eval_shape_640": [
+      1,
+      300,
+      6
+    ],
+    "b0_o2m_eval_shape_640": [
+      1,
+      11,
+      8400
+    ],
+    "warp_cfg": {
+      "split_y": 0.5,
+      "top_frac": 0.4,
+      "top_h": 256,
+      "bot_h": 384,
+      "eff_top_frac": 0.4
+    },
+    "warp_roundtrip_max_err": 6.938893903907228e-18
+  }
+}

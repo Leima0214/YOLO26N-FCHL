@@ -1,0 +1,16 @@
+{
+  "arm": "b0_p2",
+  "seed": 42,
+  "imgsz": 640,
+  "parent_desc": "HistoricalCLS minus PKI2",
+  "params": 2574360,
+  "warp": null,
+  "protocol_overrides": {},
+  "checks": {
+    "inherits_hist_non_pki_exact": true,
+    "p2_fusion_bn_count": 4,
+    "active_fuse_box_err_px": 0.00052642822265625,
+    "active_fuse_score_err": 8.149072527885437e-10,
+    "deployed_o2m_params": 2421604
+  }
+}

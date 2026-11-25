@@ -1,0 +1,271 @@
+{
+  "time": "2026-11-23T22:14:49.740086-08:00",
+  "passed": true,
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "arms": [
+    "b0",
+    "b0_w50",
+    "b0_p2",
+    "b1_768",
+    "b1_w448"
+  ],
+  "contracts": {
+    "b0": {
+      "arm": "b0",
+      "imgsz": 640,
+      "params": 2506530,
+      "deployed_o2m_params": 2376201,
+      "state_sha": "0fed01ea204dc51360b360973ad25b947a8ac831b735619f05c4c9545b4cd99a",
+      "warp": null
+    },
+    "b0_w50": {
+      "arm": "b0_w50",
+      "imgsz": 640,
+      "params": 2506530,
+      "deployed_o2m_params": 2376201,
+      "state_sha": "0fed01ea204dc51360b360973ad25b947a8ac831b735619f05c4c9545b4cd99a",
+      "warp": {
+        "split_y": 0.5,
+        "top_frac": 0.4
+      }
+    },
+    "b0_p2": {
+      "arm": "b0_p2",
+      "imgsz": 640,
+      "params": 2574360,
+      "deployed_o2m_params": 2421604,
+      "state_sha": "78dde19281949988895b80b4494fb7d480d665e030aa32439aa0b5584b2e6482",
+      "warp": null
+    },
+    "b1_768": {
+      "arm": "b1_768",
+      "imgsz": 768,
+      "params": 3246130,
+      "deployed_o2m_params": 3067810,
+      "state_sha": "b91576e3925d558d03eba9a4665879bfcd408aeacd5121fcc1c3c4167f390855",
+      "warp": null
+    },
+    "b1_w448": {
+      "arm": "b1_w448",
+      "imgsz": 640,
+      "params": 3246130,
+      "deployed_o2m_params": 3067810,
+      "state_sha": "b91576e3925d558d03eba9a4665879bfcd408aeacd5121fcc1c3c4167f390855",
+      "warp": {
+        "split_y": 0.5,
+        "top_frac": 0.3
+      }
+    }
+  },
+  "gate2_align_192_448": {
+    "max_err_px": 0.5,
+    "roundtrip_err": 0.0,
+    "rects": {
+      "upper": {
+        "obs": [
+          37.0,
+          68.0
+        ],
+        "exp": [
+          37.5,
+          67.5
+        ],
+        "err_px": 0.5
+      },
+      "lower_narrow": {
+        "obs": [
+          269.0,
+          276.0
+        ],
+        "exp": [
+          269.0,
+          276.0
+        ],
+        "err_px": 0.0
+      },
+      "straddle_horizon": {
+        "obs": [
+          180.0,
+          234.0
+        ],
+        "exp": [
+          180.0,
+          234.0
+        ],
+        "err_px": 0.0
+      }
+    }
+  },
+  "gate3_validator_8img_smoke": {
+    "b0_o2m_preds": 2400,
+    "b0_o2o_preds": 2400,
+    "b0w_o2m_preds": 2400,
+    "b0w_o2o_preds": 2400,
+    "b0_p2_preds": 2400,
+    "w448_640_native_mAP50_95_on_b1w50_pct": 68.771,
+    "w448_768_native_mAP50_95_on_b1w50_pct": 67.12,
+    "w448_coco_selector_8img_pct": {
+      "AP50_95": 68.907,
+      "AP50": 100.0,
+      "AP75": 77.492,
+      "AR100": 75.278
+    }
+  },
+  "gate4_train_4step_bs32": {
+    "b0": {
+      "imgsz": 640,
+      "warp": null,
+      "losses": [
+        [
+          3.1917,
+          11.083,
+          0.0262
+        ],
+        [
+          2.4466,
+          10.4238,
+          0.023
+        ],
+        [
+          2.6155,
+          10.0328,
+          0.0231
+        ],
+        [
+          2.7413,
+          9.1849,
+          0.0229
+        ]
+      ],
+      "changed_tensors": 228,
+      "peak_alloc_GiB": 4.36,
+      "peak_reserved_GiB": 4.738
+    },
+    "b0_w50": {
+      "imgsz": 640,
+      "warp": [
+        0.5,
+        0.4
+      ],
+      "losses": [
+        [
+          3.0743,
+          10.7676,
+          0.0286
+        ],
+        [
+          2.4755,
+          10.3636,
+          0.0242
+        ],
+        [
+          2.6297,
+          9.4957,
+          0.0271
+        ],
+        [
+          2.6036,
+          8.8277,
+          0.022
+        ]
+      ],
+      "changed_tensors": 228,
+      "peak_alloc_GiB": 4.361,
+      "peak_reserved_GiB": 4.77
+    },
+    "b0_p2": {
+      "imgsz": 640,
+      "warp": null,
+      "losses": [
+        [
+          3.1949,
+          13.1036,
+          0.0257
+        ],
+        [
+          2.4514,
+          12.4066,
+          0.023
+        ],
+        [
+          2.6175,
+          11.857,
+          0.0231
+        ],
+        [
+          2.7176,
+          10.6087,
+          0.0223
+        ]
+      ],
+      "changed_tensors": 260,
+      "peak_alloc_GiB": 8.539,
+      "peak_reserved_GiB": 9.037
+    },
+    "b1_w448": {
+      "imgsz": 640,
+      "warp": [
+        0.5,
+        0.3
+      ],
+      "losses": [
+        [
+          2.8931,
+          11.5757,
+          0.0245
+        ],
+        [
+          2.4837,
+          12.5659,
+          0.0265
+        ],
+        [
+          2.52,
+          10.6108,
+          0.0257
+        ],
+        [
+          2.5531,
+          9.7109,
+          0.0219
+        ]
+      ],
+      "changed_tensors": 304,
+      "peak_alloc_GiB": 9.598,
+      "peak_reserved_GiB": 10.135
+    },
+    "b1_768": {
+      "imgsz": 768,
+      "warp": null,
+      "losses": [
+        [
+          2.9078,
+          15.983,
+          0.0232
+        ],
+        [
+          2.4915,
+          15.7577,
+          0.0237
+        ],
+        [
+          2.566,
+          14.7151,
+          0.023
+        ],
+        [
+          2.6199,
+          12.7869,
+          0.0198
+        ]
+      ],
+      "changed_tensors": 304,
+      "peak_alloc_GiB": 13.781,
+      "peak_reserved_GiB": 14.482
+    }
+  },
+  "gate5_full_val": {
+    "images": 1000,
+    "instances": 2612
+  }
+}

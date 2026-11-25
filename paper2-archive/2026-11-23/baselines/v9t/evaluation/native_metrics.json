@@ -1,0 +1,44 @@
+{
+  "run": "v9t",
+  "label": "YOLOv9t",
+  "primary_mode": "o2m",
+  "dataset_split": "SVRDD7 Val",
+  "seed": 42,
+  "imgsz_train": 640,
+  "checkpoint_epoch_map": {
+    "last": 100,
+    "best": 89,
+    "best_ap50": 89,
+    "best_native": 89,
+    "best_native_ap50": 89
+  },
+  "e80_e90_mean": {
+    "COCO/AP50": 0.6836925983270387,
+    "COCO/AP75": 0.4348712545696649,
+    "COCO/AP50_95": 0.41637253522905215,
+    "COCO/AR100": 0.5997600934922565,
+    "metrics/mAP50(B)": 0.6865954545454546,
+    "metrics/AP75(B)": 0.4374881818181818,
+    "metrics/mAP50-95(B)": 0.4181227272727273,
+    "metrics/precision(B)": 0.7269763636363636,
+    "metrics/recall(B)": 0.6275981818181818
+  },
+  "train_log_selection_peaks": {
+    "COCO/AP50_95": {
+      "epoch": 89,
+      "metric": 0.418786
+    },
+    "COCO/AP50": {
+      "epoch": 89,
+      "metric": 0.691211
+    },
+    "metrics/mAP50-95(B)": {
+      "epoch": 89,
+      "metric": 0.42068
+    },
+    "metrics/mAP50(B)": {
+      "epoch": 89,
+      "metric": 0.69438
+    }
+  }
+}
